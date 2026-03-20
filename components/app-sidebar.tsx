@@ -1,16 +1,16 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import {
   ChatBotIcon,
   Home11Icon,
-  Settings01Icon,
   UserCircleIcon,
   Logout01Icon,
   MessageMultiple01Icon,
   Clock01Icon,
   AnalyticsUpIcon,
-  Comment02Icon,
+  Cash01Icon,
 } from "hugeicons-react";
 
 import {
@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// 1. Simulação do usuário
+// Simulação do usuário
 const currentUser = {
   name: "Lucas",
   email: "lucas@resonance.com",
@@ -41,17 +41,37 @@ const currentUser = {
   avatarUrl: "",
 };
 
-// 2. Simulação dos chats recentes (Teremos isso vindo do banco depois)
+// Simulação da Triagem da IA: Cada assunto recebe um ícone contextual
 const recentChats = [
-  { id: "TKT-1042", title: "Dúvida sobre cobrança da fatura", time: "Agora" },
-  { id: "TKT-1041", title: "Problema ao fazer login", time: "10:15" },
-  { id: "TKT-1038", title: "Cancelamento de assinatura", time: "09:30" },
+  {
+    id: "TKT-1042",
+    title: "Dúvida sobre cobrança da fatura",
+    time: "Agora",
+    icon: Cash01Icon,
+  },
+  {
+    id: "TKT-1041",
+    title: "Problema ao fazer login",
+    time: "10:15",
+    icon: UserCircleIcon,
+  },
+  {
+    id: "TKT-1038",
+    title: "Cancelamento de assinatura",
+    time: "09:30",
+    icon: Logout01Icon,
+  },
 ];
 
 export function AppSidebar() {
+  const pathname = usePathname();
+
+  // Classe CSS customizada para o item ativo
+  const activeClass =
+    "data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-semibold";
+
   return (
     <Sidebar variant="inset">
-      {/* Cabeçalho */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -74,13 +94,17 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Grupo 1: Navegação Principal */}
+        {/* Grupo 1: Workspace / Navegação Principal */}
         <SidebarGroup>
           <SidebarGroupLabel>Workspace</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/dashboard"}
+                  className={activeClass}
+                >
                   <a href="/dashboard">
                     <Home11Icon className="size-4" />
                     <span>Home</span>
@@ -88,16 +112,24 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="/dashboard/inbox">
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/inbox"}
+                  className={activeClass}
+                >
+                  <a href="/inbox">
                     <MessageMultiple01Icon className="size-4" />
                     <span>Caixa de Entrada</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="/dashboard/history">
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/history"}
+                  className={activeClass}
+                >
+                  <a href="/history">
                     <Clock01Icon className="size-4" />
                     <span>Histórico Global</span>
                   </a>
@@ -107,31 +139,40 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Grupo 2: Os Chats do Funcionário (A sua ideia aplicada) */}
+        {/* Grupo 2: Seus Atendimentos */}
         <SidebarGroup>
           <SidebarGroupLabel>Seus Atendimentos (Hoje)</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {recentChats.map((chat) => (
-                <SidebarMenuItem key={chat.id}>
-                  <SidebarMenuButton asChild tooltip={chat.title}>
-                    <a
-                      href={`/dashboard/chat/${chat.id}`}
-                      className="flex items-center gap-2"
+              {recentChats.map((chat) => {
+                const Icon = chat.icon;
+
+                return (
+                  <SidebarMenuItem key={chat.id}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={chat.title}
+                      isActive={pathname === `/chat/${chat.id}`}
+                      className={`h-auto py-2 ${activeClass}`}
                     >
-                      <Comment02Icon className="size-4 text-muted-foreground shrink-0" />
-                      <div className="flex flex-col flex-1 overflow-hidden">
-                        <span className="truncate text-sm leading-tight">
-                          {chat.title}
-                        </span>
-                        <span className="text-[10px] font-mono text-muted-foreground leading-tight">
-                          {chat.id} • {chat.time}
-                        </span>
-                      </div>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                      <a
+                        href={`/chat/${chat.id}`}
+                        className="flex items-center gap-2"
+                      >
+                        <Icon className="size-4 text-muted-foreground shrink-0" />
+                        <div className="flex flex-col flex-1 overflow-hidden">
+                          <span className="truncate text-sm leading-tight">
+                            {chat.title}
+                          </span>
+                          <span className="text-[10px] font-mono text-muted-foreground leading-tight">
+                            {chat.id} • {chat.time}
+                          </span>
+                        </div>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -143,16 +184,24 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <a href="/dashboard/settings/ai">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/settings/ai"}
+                    className={activeClass}
+                  >
+                    <a href="/settings/ai">
                       <ChatBotIcon className="size-4" />
                       <span>Treinamento IA (RAG)</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <a href="/dashboard/metrics">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/metrics"}
+                    className={activeClass}
+                  >
+                    <a href="/metrics">
                       <AnalyticsUpIcon className="size-4" />
                       <span>Métricas e Relatórios</span>
                     </a>
@@ -164,7 +213,6 @@ export function AppSidebar() {
         )}
       </SidebarContent>
 
-      {/* Rodapé do Perfil */}
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>

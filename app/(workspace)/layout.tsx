@@ -4,8 +4,8 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { HeaderTitle } from "@/components/header-title";
 
 export default function WorkspaceLayout({
   children,
@@ -16,11 +16,13 @@ export default function WorkspaceLayout({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border/40 px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="h-4" />
-            <h2 className="text-sm font-medium">Workspace</h2>
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/40 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-3">
+            <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors" />
+
+            <div className="h-4 w-px bg-border/80" />
+
+            <HeaderTitle />
           </div>
           <ThemeToggle />
         </header>
