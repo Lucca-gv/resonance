@@ -10,7 +10,11 @@ import {
   MessageMultiple01Icon,
   Clock01Icon,
   AnalyticsUpIcon,
-  Cash01Icon,
+  Settings01Icon,
+  UserGroupIcon,
+  UserMultiple02Icon,
+  ArrowRight01Icon,
+  Folder01Icon,
 } from "hugeicons-react";
 
 import {
@@ -24,6 +28,9 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -32,8 +39,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
-// Simulação do usuário
+// Mock do usuário será mantido até conectarmos com a auth real
 const currentUser = {
   name: "Lucas",
   email: "lucas@resonance.com",
@@ -41,34 +53,15 @@ const currentUser = {
   avatarUrl: "",
 };
 
-// Simulação da Triagem da IA: Cada assunto recebe um ícone contextual
-const recentChats = [
-  {
-    id: "TKT-1042",
-    title: "Dúvida sobre cobrança da fatura",
-    time: "Agora",
-    icon: Cash01Icon,
-  },
-  {
-    id: "TKT-1041",
-    title: "Problema ao fazer login",
-    time: "10:15",
-    icon: UserCircleIcon,
-  },
-  {
-    id: "TKT-1038",
-    title: "Cancelamento de assinatura",
-    time: "09:30",
-    icon: Logout01Icon,
-  },
-];
-
 export function AppSidebar() {
   const pathname = usePathname();
 
-  // Classe CSS customizada para o item ativo
   const activeClass =
     "data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-semibold";
+
+  // Verifica se alguma rota filha de admin está ativa para manter a gaveta aberta
+  const isAdminRouteActive =
+    pathname.startsWith("/settings") || pathname.startsWith("/admin");
 
   return (
     <Sidebar variant="inset">
@@ -139,76 +132,101 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Grupo 2: Seus Atendimentos */}
+        {/* Grupo 2: Seus Atendimentos - Limpo de mocks, pronto para os dados reais */}
         <SidebarGroup>
-          <SidebarGroupLabel>Seus Atendimentos (Hoje)</SidebarGroupLabel>
+          <SidebarGroupLabel>Seus Atendimentos</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {recentChats.map((chat) => {
-                const Icon = chat.icon;
-
-                return (
-                  <SidebarMenuItem key={chat.id}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={chat.title}
-                      isActive={pathname === `/chat/${chat.id}`}
-                      className={`h-auto py-2 ${activeClass}`}
-                    >
-                      <a
-                        href={`/chat/${chat.id}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Icon className="size-4 text-muted-foreground shrink-0" />
-                        <div className="flex flex-col flex-1 overflow-hidden">
-                          <span className="truncate text-sm leading-tight">
-                            {chat.title}
-                          </span>
-                          <span className="text-[10px] font-mono text-muted-foreground leading-tight">
-                            {chat.id} • {chat.time}
-                          </span>
-                        </div>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              <SidebarMenuItem>
+                <div className="text-xs text-muted-foreground px-2 py-4 text-center">
+                  Nenhum atendimento ativo no momento.
+                </div>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Grupo 3: Administração */}
+        {/* Grupo 3: Administração (Gaveta) */}
         {currentUser.role === "admin" && (
           <SidebarGroup>
             <SidebarGroupLabel>Administração</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
+            <SidebarMenu>
+              <Collapsible
+                asChild
+                defaultOpen={isAdminRouteActive}
+                className="group/collapsible"
+              >
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === "/settings/ai"}
-                    className={activeClass}
-                  >
-                    <a href="/settings/ai">
-                      <ChatBotIcon className="size-4" />
-                      <span>Treinamento IA (RAG)</span>
-                    </a>
-                  </SidebarMenuButton>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      tooltip="Ajustes e Gestão"
+                      id="tour-admin-menu"
+                    >
+                      <Settings01Icon className="size-4" />
+                      <span>Configurações</span>
+                      <ArrowRight01Icon className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === "/settings/ai"}
+                          className={activeClass}
+                          id="tour-ai-training"
+                        >
+                          <a href="/settings/ai">
+                            <ChatBotIcon className="size-4" />
+                            <span>Treinamento da IA</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === "/admin/team"}
+                          className={activeClass}
+                        >
+                          <a href="/admin/team">
+                            <UserGroupIcon className="size-4" />
+                            <span>Equipe Interna</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === "/admin/customers"}
+                          className={activeClass}
+                        >
+                          <a href="/admin/customers">
+                            <UserMultiple02Icon className="size-4" />
+                            <span>Clientes</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === "/metrics"}
+                          className={activeClass}
+                        >
+                          <a href="/metrics">
+                            <AnalyticsUpIcon className="size-4" />
+                            <span>Métricas</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === "/metrics"}
-                    className={activeClass}
-                  >
-                    <a href="/metrics">
-                      <AnalyticsUpIcon className="size-4" />
-                      <span>Métricas e Relatórios</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
+              </Collapsible>
+            </SidebarMenu>
           </SidebarGroup>
         )}
       </SidebarContent>
