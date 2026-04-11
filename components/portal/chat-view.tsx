@@ -166,7 +166,10 @@ export function ChatView({
                           <span
                             className={`block text-[10px] mt-1 text-right ${msg.role === "user" ? "text-indigo-200" : "text-muted-foreground"}`}
                           >
-                            {msg.time}
+                            {msg.createdAt.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </span>
                         </div>
                         {msg.role === "user" && (
